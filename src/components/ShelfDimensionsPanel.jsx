@@ -137,19 +137,7 @@ function ShelfDimensionsPanel({ shelf, onUpdateShelf, onClose }) {
                 onChange={(e) => handleChange('color', e.target.value)}
                 className="color-picker"
               />
-              <input
-                type="text"
-                value={dimensions.color}
-                onChange={(e) => handleChange('color', e.target.value)}
-                placeholder="#8B4513"
-                pattern="^#[0-9A-Fa-f]{6}$"
-                className="color-text-input"
-              />
-              <div 
-                className="color-preview" 
-                style={{ backgroundColor: dimensions.color }}
-                title={dimensions.color}
-              />
+              <span className="color-value">{dimensions.color}</span>
             </div>
             <span className="help-text">Scegli un colore per lo scaffale</span>
           </div>
