@@ -72,6 +72,74 @@
   margin-top: 0.5rem;
 }
 
+.color-group {
+  background: rgba(255, 215, 0, 0.1);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.color-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #FFD700;
+}
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 0.5rem;
+  transition: all 0.2s;
+}
+
+.color-picker-container:focus-within {
+  border-color: #FFD700;
+}
+
+.color-picker {
+  width: 50px;
+  height: 40px;
+  border: 2px solid #3a3a3a;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}
+
+.color-text-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  outline: none;
+  text-transform: uppercase;
+}
+
+.color-preview {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid #3a3a3a;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 .dimensions-form label {
   font-size: 0.9rem;
   font-weight: 500;

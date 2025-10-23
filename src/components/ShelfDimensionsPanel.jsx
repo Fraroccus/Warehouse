@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Maximize2 } from 'lucide-react'
+import { X, Maximize2, Palette } from 'lucide-react'
 import './ShelfDimensionsPanel.css'
 
 function ShelfDimensionsPanel({ shelf, onUpdateShelf, onClose }) {
@@ -7,7 +7,8 @@ function ShelfDimensionsPanel({ shelf, onUpdateShelf, onClose }) {
     width: shelf.size[0],
     height: shelf.size[1],
     depth: shelf.size[2],
-    elevation: shelf.position[1] - (shelf.size[1] / 2) // Calculate current elevation (ground offset)
+    elevation: shelf.position[1] - (shelf.size[1] / 2), // Calculate current elevation (ground offset)
+    color: shelf.color || '#8B4513'
   })
 
   const handleSubmit = (e) => {
@@ -32,7 +33,8 @@ function ShelfDimensionsPanel({ shelf, onUpdateShelf, onClose }) {
     
     onUpdateShelf(shelf.id, { 
       size: newSize,
-      position: newPosition
+      position: newPosition,
+      color: dimensions.color
     })
     
     onClose()
@@ -121,6 +123,35 @@ function ShelfDimensionsPanel({ shelf, onUpdateShelf, onClose }) {
               <span className="unit">m</span>
             </div>
             <span className="help-text">Distanza dal pavimento (0 = a terra)</span>
+          </div>
+
+          <div className="form-group color-group">
+            <label>
+              <Palette size={16} />
+              Colore scaffale
+            </label>
+            <div className="color-picker-container">
+              <input
+                type="color"
+                value={dimensions.color}
+                onChange={(e) => handleChange('color', e.target.value)}
+                className="color-picker"
+              />
+              <input
+                type="text"
+                value={dimensions.color}
+                onChange={(e) => handleChange('color', e.target.value)}
+                placeholder="#8B4513"
+                pattern="^#[0-9A-Fa-f]{6}$"
+                className="color-text-input"
+              />
+              <div 
+                className="color-preview" 
+                style={{ backgroundColor: dimensions.color }}
+                title={dimensions.color}
+              />
+            </div>
+            <span className="help-text">Scegli un colore per lo scaffale</span>
           </div>
 
           <div className="dimension-preview">
