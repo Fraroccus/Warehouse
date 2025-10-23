@@ -1,0 +1,35 @@
+.data-manager {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.data-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: #3a3a3a;
+  color: #fff;
+  border: 1px solid #4a4a4a;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.data-btn:hover {
+  background: #4a4a4a;
+  transform: translateY(-1px);
+}
+
+.export-btn:hover {
+  background: #4CAF50;
+  border-color: #4CAF50;
+}
+
+.import-btn:hover {
+  background: #2196F3;
+  border-color: #2196F3;
+}

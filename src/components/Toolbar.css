@@ -1,0 +1,72 @@
+.toolbar {
+  background: #2a2a2a;
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid #3a3a3a;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  z-index: 50;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: #3a3a3a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.toolbar-btn:hover {
+  background: #4a4a4a;
+  transform: translateY(-1px);
+}
+
+.toolbar-btn.active {
+  background: #4CAF50;
+}
+
+.toolbar-btn.active:hover {
+  background: #45a049;
+}
+
+.notes-btn {
+  position: relative;
+}
+
+.notes-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #f44336;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.edit-instructions {
+  margin-left: auto;
+  color: #FFD700;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 6px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 30px;
+  background: #4a4a4a;
+  margin: 0 0.5rem;
+}
