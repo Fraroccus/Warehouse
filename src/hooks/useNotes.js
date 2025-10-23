@@ -20,7 +20,7 @@ export function useNotes() {
     const notesChannel = supabase
       .channel('notes-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => {
-        loadData()
+        loadDataSilently() // Load without showing loading screen
       })
       .subscribe()
 
@@ -29,8 +29,8 @@ export function useNotes() {
     }
   }, [offline])
 
-  const loadData = async () => {
-    setLoading(true)
+  const loadData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     
     if (offline) {
       // Load from localStorage
@@ -70,8 +70,11 @@ export function useNotes() {
       }
     }
     
-    setLoading(false)
+    if (showLoading) setLoading(false)
   }
+
+  // Load data without showing loading screen (for real-time updates)
+  const loadDataSilently = () => loadData(false)
 
   // Save to localStorage when offline
   useEffect(() => {
@@ -88,9 +91,11 @@ export function useNotes() {
       ...noteData
     }
 
-    if (offline) {
-      setNotes(prev => [newNote, ...prev])
-    } else {
+    // Optimistic update: add to UI immediately
+    const previousNotes = notes
+    setNotes(prev => [newNote, ...prev])
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('notes')
@@ -102,21 +107,25 @@ export function useNotes() {
           }])
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error adding note:', error)
+        // Rollback on error
+        setNotes(previousNotes)
       }
     }
   }
 
   const markAsRead = async (noteId) => {
-    if (offline) {
-      setNotes(prev => prev.map(note =>
-        note.id === noteId
-          ? { ...note, isRead: true, readAt: Date.now() }
-          : note
-      ))
-    } else {
+    // Optimistic update: update UI immediately
+    const previousNotes = notes
+    setNotes(prev => prev.map(note =>
+      note.id === noteId
+        ? { ...note, isRead: true, readAt: Date.now() }
+        : note
+    ))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('notes')
@@ -127,9 +136,11 @@ export function useNotes() {
           .eq('id', noteId)
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error marking note as read:', error)
+        // Rollback on error
+        setNotes(previousNotes)
       }
     }
   }

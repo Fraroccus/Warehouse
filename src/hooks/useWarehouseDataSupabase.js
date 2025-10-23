@@ -20,10 +20,10 @@ export function useWarehouseData() {
     const shelvesChannel = supabase
       .channel('shelves-changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'shelves' }, () => {
-        loadData()
+        loadDataSilently() // Load without showing loading screen
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, () => {
-        loadData()
+        loadDataSilently() // Load without showing loading screen
       })
       .subscribe()
 
@@ -32,8 +32,8 @@ export function useWarehouseData() {
     }
   }, [offline])
 
-  const loadData = async () => {
-    setLoading(true)
+  const loadData = async (showLoading = true) => {
+    if (showLoading) setLoading(true)
     
     if (offline) {
       // Load from localStorage
@@ -87,8 +87,11 @@ export function useWarehouseData() {
       }
     }
     
-    setLoading(false)
+    if (showLoading) setLoading(false)
   }
+
+  // Load data without showing loading screen (for real-time updates)
+  const loadDataSilently = () => loadData(false)
 
   // Save to localStorage when offline
   useEffect(() => {
@@ -107,6 +110,9 @@ export function useWarehouseData() {
     if (offline) {
       setShelves(prev => [...prev, newShelf])
     } else {
+      // Optimistic update: add to UI immediately
+      setShelves(prev => [...prev, newShelf])
+      
       try {
         const { error } = await supabase
           .from('shelves')
@@ -119,19 +125,23 @@ export function useWarehouseData() {
           }])
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error adding shelf:', error)
+        // Rollback on error
+        setShelves(prev => prev.filter(s => s.id !== newShelf.id))
       }
     }
   }
 
   const updateShelf = async (shelfId, updates) => {
-    if (offline) {
-      setShelves(prev => prev.map(shelf =>
-        shelf.id === shelfId ? { ...shelf, ...updates } : shelf
-      ))
-    } else {
+    // Optimistic update: update UI immediately
+    const previousShelves = shelves
+    setShelves(prev => prev.map(shelf =>
+      shelf.id === shelfId ? { ...shelf, ...updates } : shelf
+    ))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('shelves')
@@ -144,17 +154,21 @@ export function useWarehouseData() {
           .eq('id', shelfId)
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error updating shelf:', error)
+        // Rollback on error
+        setShelves(previousShelves)
       }
     }
   }
 
   const deleteShelf = async (shelfId) => {
-    if (offline) {
-      setShelves(prev => prev.filter(shelf => shelf.id !== shelfId))
-    } else {
+    // Optimistic update: remove from UI immediately
+    const previousShelves = shelves
+    setShelves(prev => prev.filter(shelf => shelf.id !== shelfId))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('shelves')
@@ -162,9 +176,11 @@ export function useWarehouseData() {
           .eq('id', shelfId)
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error deleting shelf:', error)
+        // Rollback on error
+        setShelves(previousShelves)
       }
     }
   }
@@ -175,17 +191,19 @@ export function useWarehouseData() {
       ...itemData
     }
 
-    if (offline) {
-      setShelves(prev => prev.map(shelf => {
-        if (shelf.id === shelfId) {
-          return {
-            ...shelf,
-            items: [...(shelf.items || []), newItem]
-          }
+    // Optimistic update: add to UI immediately
+    const previousShelves = shelves
+    setShelves(prev => prev.map(shelf => {
+      if (shelf.id === shelfId) {
+        return {
+          ...shelf,
+          items: [...(shelf.items || []), newItem]
         }
-        return shelf
-      }))
-    } else {
+      }
+      return shelf
+    }))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('items')
@@ -197,27 +215,31 @@ export function useWarehouseData() {
           }])
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error adding item:', error)
+        // Rollback on error
+        setShelves(previousShelves)
       }
     }
   }
 
   const updateItem = async (shelfId, itemId, updates) => {
-    if (offline) {
-      setShelves(prev => prev.map(shelf => {
-        if (shelf.id === shelfId) {
-          return {
-            ...shelf,
-            items: shelf.items.map(item =>
-              item.id === itemId ? { ...item, ...updates } : item
-            )
-          }
+    // Optimistic update: update UI immediately
+    const previousShelves = shelves
+    setShelves(prev => prev.map(shelf => {
+      if (shelf.id === shelfId) {
+        return {
+          ...shelf,
+          items: shelf.items.map(item =>
+            item.id === itemId ? { ...item, ...updates } : item
+          )
         }
-        return shelf
-      }))
-    } else {
+      }
+      return shelf
+    }))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('items')
@@ -228,25 +250,29 @@ export function useWarehouseData() {
           .eq('id', itemId)
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error updating item:', error)
+        // Rollback on error
+        setShelves(previousShelves)
       }
     }
   }
 
   const deleteItem = async (shelfId, itemId) => {
-    if (offline) {
-      setShelves(prev => prev.map(shelf => {
-        if (shelf.id === shelfId) {
-          return {
-            ...shelf,
-            items: shelf.items.filter(item => item.id !== itemId)
-          }
+    // Optimistic update: remove from UI immediately
+    const previousShelves = shelves
+    setShelves(prev => prev.map(shelf => {
+      if (shelf.id === shelfId) {
+        return {
+          ...shelf,
+          items: shelf.items.filter(item => item.id !== itemId)
         }
-        return shelf
-      }))
-    } else {
+      }
+      return shelf
+    }))
+
+    if (!offline) {
       try {
         const { error } = await supabase
           .from('items')
@@ -254,9 +280,11 @@ export function useWarehouseData() {
           .eq('id', itemId)
 
         if (error) throw error
-        await loadData()
+        // Real-time subscription will handle updates from other users
       } catch (error) {
         console.error('Error deleting item:', error)
+        // Rollback on error
+        setShelves(previousShelves)
       }
     }
   }
