@@ -145,10 +145,33 @@ export function useNotes() {
     }
   }
 
+  const deleteNote = async (noteId) => {
+    // Optimistic update: remove from UI immediately
+    const previousNotes = notes
+    setNotes(prev => prev.filter(note => note.id !== noteId))
+
+    if (!offline) {
+      try {
+        const { error } = await supabase
+          .from('notes')
+          .delete()
+          .eq('id', noteId)
+
+        if (error) throw error
+        // Real-time subscription will handle updates from other users
+      } catch (error) {
+        console.error('Error deleting note:', error)
+        // Rollback on error
+        setNotes(previousNotes)
+      }
+    }
+  }
+
   return {
     notes,
     loading,
     addNote,
-    markAsRead
+    markAsRead,
+    deleteNote
   }
 }

@@ -26,7 +26,8 @@ function App() {
     notes,
     loading: notesLoading,
     addNote,
-    markAsRead
+    markAsRead,
+    deleteNote
   } = useNotes()
 
   const [selectedShelf, setSelectedShelf] = useState(null)
@@ -79,6 +80,10 @@ function App() {
 
   const handleMarkAsRead = (noteId) => {
     markAsRead(noteId)
+  }
+
+  const handleDeleteNote = (noteId) => {
+    deleteNote(noteId)
   }
 
   const handleImportData = async (data) => {
@@ -180,6 +185,7 @@ function App() {
             notes={notes}
             onAddNote={handleAddNote}
             onMarkAsRead={handleMarkAsRead}
+            onDeleteNote={handleDeleteNote}
             onClose={() => setShowNotes(false)}
           />
         )}

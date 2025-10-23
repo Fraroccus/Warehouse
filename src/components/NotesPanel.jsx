@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { StickyNote, Plus, X, Check, History, Calendar } from 'lucide-react'
+import { StickyNote, Plus, X, Check, History, Calendar, Trash2 } from 'lucide-react'
 import './NotesPanel.css'
 
-function NotesPanel({ notes, onAddNote, onMarkAsRead, onClose }) {
+function NotesPanel({ notes, onAddNote, onMarkAsRead, onDeleteNote, onClose }) {
   const [isAdding, setIsAdding] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [formData, setFormData] = useState({ title: '', content: '' })
@@ -74,10 +74,19 @@ function NotesPanel({ notes, onAddNote, onMarkAsRead, onClose }) {
                   <div key={note.id} className="history-note">
                     <div className="history-note-header">
                       <h4>{note.title}</h4>
-                      <span className="history-date">
-                        <Calendar size={14} />
-                        {formatDate(note.createdAt)}
-                      </span>
+                      <div className="history-note-actions">
+                        <span className="history-date">
+                          <Calendar size={14} />
+                          {formatDate(note.createdAt)}
+                        </span>
+                        <button
+                          onClick={() => onDeleteNote(note.id)}
+                          className="delete-note-btn"
+                          title="Elimina nota"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </div>
                     <p>{note.content}</p>
                     {note.readAt && (
